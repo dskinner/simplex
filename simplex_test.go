@@ -21,7 +21,7 @@ func TestMaximize(t *testing.T) {
 	)
 
 	if err := prg.Maximize(); err != nil {
-		t.Log(err)
+		t.Error(err)
 	}
 
 	prg.For(&x1, &x2)
@@ -40,7 +40,7 @@ func TestMinimize(t *testing.T) {
 	)
 
 	if err := prg.Minimize(); err != nil {
-		t.Log(err)
+		t.Error(err)
 	}
 
 	prg.For(&x1, &x2)
@@ -59,7 +59,7 @@ func TestDegeneracy(t *testing.T) {
 	)
 
 	if err := prg.Maximize(); err != nil {
-		t.Log(err)
+		t.Error(err)
 	}
 
 	prg.For(&x1, &x2)
@@ -78,7 +78,7 @@ func TestAlternateOptimum(t *testing.T) {
 	)
 
 	if err := prg.Maximize(); err != nil {
-		t.Log(err)
+		t.Error(err)
 	}
 
 	prg.For(&x1, &x2)
@@ -131,7 +131,7 @@ func TestEquations(t *testing.T) {
 	)
 
 	if err := prg.Minimize(); err != nil {
-		t.Log(err)
+		t.Error(err)
 	}
 
 	prg.For(&x1, &x2)
@@ -152,7 +152,7 @@ func TestUnrestricted(t *testing.T) {
 	)
 
 	if err := prg.Maximize(); err != nil {
-		t.Log(err)
+		t.Error(err)
 	}
 
 	prg.For(&x1, &x2)
@@ -174,7 +174,7 @@ func TestTwoLines(t *testing.T) {
 	)
 
 	if err := prg.Minimize(); err != nil {
-		t.Log(err)
+		t.Error(err)
 	}
 
 	prg.For(&a, &b, &c, &d)
@@ -213,7 +213,7 @@ func TestCircular(t *testing.T) {
 		Constrain(Coef{1, c3}).LessEq(480),
 	)
 	if err := prg.Minimize(); err != nil {
-		t.Log(err)
+		t.Error(err)
 	}
 	prg.For(
 		&a0, &a1, &a2, &a3,
