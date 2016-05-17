@@ -15,11 +15,11 @@ var (
 
 type Var struct {
 	int
-	Val float32
+	Val float64
 }
 
 type Coef struct {
-	C float32
+	C float64
 	V Var
 }
 
@@ -34,24 +34,24 @@ const (
 type Constraint struct {
 	Cs []Coef
 	Eq Relation
-	To float32
+	To float64
 }
 
 func Constrain(vs ...Coef) Constraint {
 	return Constraint{Cs: vs}
 }
 
-func (cn Constraint) LessEq(x float32) Constraint {
+func (cn Constraint) LessEq(x float64) Constraint {
 	cn.Eq, cn.To = LessEq, x
 	return cn
 }
 
-func (cn Constraint) GreaterEq(x float32) Constraint {
+func (cn Constraint) GreaterEq(x float64) Constraint {
 	cn.Eq, cn.To = GreaterEq, x
 	return cn
 }
 
-func (cn Constraint) Equal(x float32) Constraint {
+func (cn Constraint) Equal(x float64) Constraint {
 	cn.Eq, cn.To = Equal, x
 	return cn
 }
@@ -68,12 +68,12 @@ type Program struct {
 	isMin bool
 }
 
-func (prg *Program) Var(coef float32) Var {
+func (prg *Program) Var(coef float64) Var {
 	prg.c = append(prg.c, coef)
 	return Var{len(prg.c) - 1, 0}
 }
 
-func (prg *Program) Z() float32 {
+func (prg *Program) Z() float64 {
 	lr := prg.tbl[len(prg.tbl)-1]
 	z := lr[len(lr)-1]
 	if prg.isMin {
@@ -116,11 +116,11 @@ func (prg *Program) AddConstraints(cns ...Constraint) {
 			for i := range prg.s {
 				n := len(prg.s[0]) - len(prg.s[i])
 				if n > 0 {
-					prg.s[i] = append(prg.s[i], make([]float32, n)...)
+					prg.s[i] = append(prg.s[i], make([]float64, n)...)
 				}
 			}
 			s := prg.s[len(prg.s)-1]
-			s[len(s)-1] = float32(cn.Eq)
+			s[len(s)-1] = float64(cn.Eq)
 		}
 
 		// introduce artificials for >= and ==
@@ -134,7 +134,7 @@ func (prg *Program) AddConstraints(cns ...Constraint) {
 			for i := range prg.r {
 				n := len(prg.r[0]) - len(prg.r[i])
 				if n > 0 {
-					prg.r[i] = append(prg.r[i], make([]float32, n)...)
+					prg.r[i] = append(prg.r[i], make([]float64, n)...)
 				}
 			}
 			r := prg.r[len(prg.r)-1]
@@ -189,7 +189,7 @@ func (prg *Program) iter() error {
 
 	var err error
 	var pi, pj int     // pivot indices
-	var px, py float32 // pivot values
+	var px, py float64 // pivot values
 	for {
 		// find pivot indices
 		prg.tbl.Column(&bnd, len(prg.tbl[0])-1)
@@ -268,7 +268,7 @@ func (prg *Program) twophase(min bool) error {
 	prg.tbl.Transpose(&prg.tbl)
 	prg.r.Transpose(&prg.r)
 	for _, row := range prg.r {
-		xs := make([]float32, len(row)+1)
+		xs := make([]float64, len(row)+1)
 		copy(xs, row)
 		prg.tbl.Insert(len(prg.tbl)-1, xs)
 	}
@@ -395,7 +395,7 @@ func (prg *Program) For(vars ...*Var) {
 }
 
 // Theta returns the minimum result of division ops of only positive divisors.
-func Theta(a, b Vec) (int, float32) {
+func Theta(a, b Vec) (int, float64) {
 	if len(a) != len(b) {
 		panic("a Vec length does not match b Vec length")
 	}
@@ -405,7 +405,7 @@ func Theta(a, b Vec) (int, float32) {
 	// .. choosing variable with smallest subscript is easy way to avoid cycling
 
 	j := -1
-	theta := float32(math.MaxFloat32)
+	theta := float64(math.MaxFloat32)
 	for i, x := range b {
 		if x > 0 {
 			if y := a[i] / x; theta > y {

@@ -4,11 +4,11 @@ import "testing"
 
 const epsilon = 0.0001
 
-func equals(a, b float32) bool {
+func equals(a, b float64) bool {
 	return equaleps(a, b, epsilon)
 }
 
-func equaleps(a, b float32, eps float32) bool {
+func equaleps(a, b float64, eps float64) bool {
 	return (a-b) < eps && (b-a) < eps
 }
 
@@ -25,7 +25,7 @@ func TestMaximize(t *testing.T) {
 	}
 
 	prg.For(&x1, &x2)
-	var wz, w1, w2 float32 = 27, 2, 3
+	var wz, w1, w2 float64 = 27, 2, 3
 	if z := prg.Z(); !equals(z, wz) || !equals(x1.Val, w1) || !equals(x2.Val, w2) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f x1=%.2f x2=%.2f\nWant Z=%.2f x1=%.2f x2=%.2f\n%s\n", z, x1.Val, x2.Val, wz, w1, w2, prg.tbl)
 	}
@@ -44,7 +44,7 @@ func TestMinimize(t *testing.T) {
 	}
 
 	prg.For(&x1, &x2)
-	var wz, w1, w2 float32 = 124.0 / 11, 20.0 / 11, 16.0 / 11
+	var wz, w1, w2 float64 = 124.0 / 11, 20.0 / 11, 16.0 / 11
 	if z := prg.Z(); !equals(z, wz) || !equals(x1.Val, w1) || !equals(x2.Val, w2) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f x1=%.2f x2=%.2f\nWant Z=%.2f x1=%.2f x2=%.2f\n%s\n", z, x1.Val, x2.Val, z, w1, w2, prg.tbl)
 	}
@@ -63,7 +63,7 @@ func TestDegeneracy(t *testing.T) {
 	}
 
 	prg.For(&x1, &x2)
-	var wz, w1, w2 float32 = 16, 4, 0
+	var wz, w1, w2 float64 = 16, 4, 0
 	if z := prg.Z(); !equals(z, wz) || !equals(x1.Val, w1) || !equals(x2.Val, w2) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f x1=%.2f x2=%.2f\nWant Z=%.2f x1=%.2f x2=%.2f\n%s\n", z, x1.Val, x2.Val, wz, w1, w2, prg.tbl)
 	}
@@ -82,7 +82,7 @@ func TestAlternateOptimum(t *testing.T) {
 	}
 
 	prg.For(&x1, &x2)
-	var wz, w1, w2 float32 = 25.0 / 2, 5.0 / 7, 45.0 / 14
+	var wz, w1, w2 float64 = 25.0 / 2, 5.0 / 7, 45.0 / 14
 	if z := prg.Z(); !equals(z, wz) || !equals(x1.Val, w1) || !equals(x2.Val, w2) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f x1=%.2f x2=%.2f\nWant Z=%.2f x1=%.2f x2=%.2f\n%s\n", z, x1.Val, x2.Val, wz, w1, w2, prg.tbl)
 	}
@@ -135,10 +135,28 @@ func TestEquations(t *testing.T) {
 	}
 
 	prg.For(&x1, &x2)
-	var wz, w1, w2 float32 = 2, 0, 2
+	var wz, w1, w2 float64 = 2, 0, 2
 	if z := prg.Z(); !equals(z, wz) || !equals(x1.Val, w1) || !equals(x2.Val, w2) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f x1=%.2f x2=%.2f\nWant Z=%.2f x1=%.2f x2=%.2f\n%s\n", z, x1.Val, x2.Val, wz, w1, w2, prg.tbl)
 	}
+}
+
+func TestUnrestricted(t *testing.T) {
+	prg := new(Program)
+	x1, x2 := prg.Var(4), prg.Var(5)
+	prg.AddConstraints(
+		Constrain(Coef{2, x1}, Coef{3, x2}).LessEq(8),
+		Constrain(Coef{1, x1}, Coef{4, x2}).LessEq(10),
+		// x1 unrestricted
+		Constrain(Coef{1, x2}).GreaterEq(0),
+	)
+
+	if err := prg.Maximize(); err != nil {
+		t.Log(err)
+	}
+
+	prg.For(&x1, &x2)
+	t.Logf("result: Z=%.2f x1=%.2f x2=%.2f\n", prg.Z(), x1.Val, x2.Val)
 }
 
 func TestTwoLines(t *testing.T) {
@@ -160,7 +178,7 @@ func TestTwoLines(t *testing.T) {
 	}
 
 	prg.For(&a, &b, &c, &d)
-	var wz, wa, wb, wc, wd float32 = 220, 0, 50, 60, 110
+	var wz, wa, wb, wc, wd float64 = 220, 0, 50, 60, 110
 	if z := prg.Z(); !equals(z, wz) || !equals(a.Val, wa) || !equals(b.Val, wb) || !equals(c.Val, wc) || !equals(d.Val, wd) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f a=%.2f b=%.2f c=%.2f d=%.2f\nWant Z=%.2f a=%.2f b=%.2f c=%.2f d=%.2f\n%s\n", z, a.Val, b.Val, c.Val, d.Val, wz, wa, wb, wc, wd, prg.tbl)
 	}

@@ -5,9 +5,9 @@ import (
 	"fmt"
 )
 
-type Vec []float32
+type Vec []float64
 
-func (a Vec) Dot(b Vec) (c float32) {
+func (a Vec) Dot(b Vec) (c float64) {
 	if len(a) != len(b) {
 		panic("a Vec length does not match b Vec length")
 	}
@@ -26,7 +26,7 @@ func (a Vec) Sub(c *Vec, b Vec) {
 	}
 }
 
-func (a Vec) MulScalar(b *Vec, x float32) {
+func (a Vec) MulScalar(b *Vec, x float64) {
 	for i, v := range a {
 		(*b)[i] = v * x
 	}
@@ -42,7 +42,7 @@ func (a Vec) Div(b Vec) (c Vec) {
 	return
 }
 
-func (a Vec) Max() (i int, x float32) {
+func (a Vec) Max() (i int, x float64) {
 	for j, y := range a {
 		if j == 0 || y > x {
 			i, x = j, y
@@ -51,7 +51,7 @@ func (a Vec) Max() (i int, x float32) {
 	return
 }
 
-func (v *Vec) Insert(i int, x float32) {
+func (v *Vec) Insert(i int, x float64) {
 	*v = append(*v, 0)
 	copy((*v)[i+1:], (*v)[i:])
 	(*v)[i] = x
@@ -59,7 +59,7 @@ func (v *Vec) Insert(i int, x float32) {
 
 type Mat []Vec
 
-func (m *Mat) Insert(i int, xs []float32) {
+func (m *Mat) Insert(i int, xs []float64) {
 	*m = append(*m, nil)
 	copy((*m)[i+1:], (*m)[i:])
 	(*m)[i] = xs
