@@ -6,6 +6,16 @@ import (
 	"math"
 )
 
+const epsilon = 0.0001
+
+func equals(a, b float64) bool {
+	return equaleps(a, b, epsilon)
+}
+
+func equaleps(a, b float64, eps float64) bool {
+	return (a-b) < eps && (b-a) < eps
+}
+
 var (
 	ErrUnbounded  = errors.New("simplex: problem is unbounded")
 	ErrInfeasible = errors.New("simplex: problem is infeasible")
@@ -200,6 +210,11 @@ func (prg *Program) iter() error {
 			// don't select if ident since this var has already entered basis
 			if prg.tbl.IsColIdent(j) {
 				continue
+			}
+			// TODO near-zero cases are a common point of error during iteration but ultimately
+			// it'd be worth investigating the use of something like math/big for exact results.
+			if equals(y, 0) {
+				y = 0
 			}
 			if y > py || (py == 0 && y == 0 && j < len(prg.c)) {
 				prg.tbl.Column(&col, j)
@@ -405,7 +420,7 @@ func Theta(a, b Vec) (int, float64) {
 	// .. choosing variable with smallest subscript is easy way to avoid cycling
 
 	j := -1
-	theta := float64(math.MaxFloat32)
+	theta := math.MaxFloat64
 	for i, x := range b {
 		if x > 0 {
 			if y := a[i] / x; theta > y {

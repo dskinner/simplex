@@ -2,16 +2,6 @@ package simplex
 
 import "testing"
 
-const epsilon = 0.0001
-
-func equals(a, b float64) bool {
-	return equaleps(a, b, epsilon)
-}
-
-func equaleps(a, b float64, eps float64) bool {
-	return (a-b) < eps && (b-a) < eps
-}
-
 func TestMaximize(t *testing.T) {
 	prg := new(Program)
 	x1, x2 := prg.Var(6), prg.Var(5)
