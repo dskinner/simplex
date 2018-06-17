@@ -1,0 +1,5 @@
+BenchmarkMaximize-4   	 2000000	       954 ns/op	     496 B/op	      12 allocs/op
+BenchmarkMinimize-4   	  300000	      5404 ns/op	    3056 B/op	      94 allocs/op
+BenchmarkCircular-4   	   10000	    134998 ns/op	  100280 B/op	     982 allocs/op
+PASS
+ok  	dasa.cc/simplex	5.909s

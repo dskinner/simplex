@@ -1,6 +1,9 @@
 package simplex
 
-import "testing"
+import (
+	"math/big"
+	"testing"
+)
 
 func TestMaximize(t *testing.T) {
 	prg := new(Program)
@@ -15,9 +18,9 @@ func TestMaximize(t *testing.T) {
 	}
 
 	prg.For(&x1, &x2)
-	var wz, w1, w2 float64 = 27, 2, 3
+	var wz, w1, w2 *big.Rat = big.NewRat(27, 1), big.NewRat(2, 1), big.NewRat(3, 1)
 	if z := prg.Z(); !equals(z, wz) || !equals(x1.Val, w1) || !equals(x2.Val, w2) {
-		t.Fatalf("unexpected result:\nHave Z=%.2f x1=%.2f x2=%.2f\nWant Z=%.2f x1=%.2f x2=%.2f\n%s\n", z, x1.Val, x2.Val, wz, w1, w2, prg.tbl)
+		t.Fatalf("unexpected result:\nHave Z=%v x1=%v x2=%v\nWant Z=%v x1=%v x2=%v\n%s\n", z, x1.Val, x2.Val, wz, w1, w2, prg.tbl)
 	}
 }
 
@@ -34,7 +37,7 @@ func TestMinimize(t *testing.T) {
 	}
 
 	prg.For(&x1, &x2)
-	var wz, w1, w2 float64 = 124.0 / 11, 20.0 / 11, 16.0 / 11
+	var wz, w1, w2 *big.Rat = big.NewRat(124, 11), big.NewRat(20, 11), big.NewRat(16, 11)
 	if z := prg.Z(); !equals(z, wz) || !equals(x1.Val, w1) || !equals(x2.Val, w2) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f x1=%.2f x2=%.2f\nWant Z=%.2f x1=%.2f x2=%.2f\n%s\n", z, x1.Val, x2.Val, z, w1, w2, prg.tbl)
 	}
@@ -53,7 +56,7 @@ func TestDegeneracy(t *testing.T) {
 	}
 
 	prg.For(&x1, &x2)
-	var wz, w1, w2 float64 = 16, 4, 0
+	var wz, w1, w2 *big.Rat = big.NewRat(16, 1), big.NewRat(4, 1), &big.Rat{}
 	if z := prg.Z(); !equals(z, wz) || !equals(x1.Val, w1) || !equals(x2.Val, w2) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f x1=%.2f x2=%.2f\nWant Z=%.2f x1=%.2f x2=%.2f\n%s\n", z, x1.Val, x2.Val, wz, w1, w2, prg.tbl)
 	}
@@ -72,7 +75,7 @@ func TestAlternateOptimum(t *testing.T) {
 	}
 
 	prg.For(&x1, &x2)
-	var wz, w1, w2 float64 = 25.0 / 2, 5.0 / 7, 45.0 / 14
+	var wz, w1, w2 *big.Rat = big.NewRat(25, 2), big.NewRat(5, 7), big.NewRat(45, 14)
 	if z := prg.Z(); !equals(z, wz) || !equals(x1.Val, w1) || !equals(x2.Val, w2) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f x1=%.2f x2=%.2f\nWant Z=%.2f x1=%.2f x2=%.2f\n%s\n", z, x1.Val, x2.Val, wz, w1, w2, prg.tbl)
 	}
@@ -125,7 +128,7 @@ func TestEquations(t *testing.T) {
 	}
 
 	prg.For(&x1, &x2)
-	var wz, w1, w2 float64 = 2, 0, 2
+	var wz, w1, w2 *big.Rat = big.NewRat(2, 1), &big.Rat{}, big.NewRat(2, 1)
 	if z := prg.Z(); !equals(z, wz) || !equals(x1.Val, w1) || !equals(x2.Val, w2) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f x1=%.2f x2=%.2f\nWant Z=%.2f x1=%.2f x2=%.2f\n%s\n", z, x1.Val, x2.Val, wz, w1, w2, prg.tbl)
 	}
@@ -168,7 +171,7 @@ func TestTwoLines(t *testing.T) {
 	}
 
 	prg.For(&a, &b, &c, &d)
-	var wz, wa, wb, wc, wd float64 = 220, 0, 50, 60, 110
+	var wz, wa, wb, wc, wd *big.Rat = big.NewRat(220, 1), big.NewRat(0, 1), big.NewRat(50, 1), big.NewRat(60, 1), big.NewRat(110, 1)
 	if z := prg.Z(); !equals(z, wz) || !equals(a.Val, wa) || !equals(b.Val, wb) || !equals(c.Val, wc) || !equals(d.Val, wd) {
 		t.Fatalf("unexpected result:\nHave Z=%.2f a=%.2f b=%.2f c=%.2f d=%.2f\nWant Z=%.2f a=%.2f b=%.2f c=%.2f d=%.2f\n%s\n", z, a.Val, b.Val, c.Val, d.Val, wz, wa, wb, wc, wd, prg.tbl)
 	}
@@ -210,9 +213,9 @@ func TestCircular(t *testing.T) {
 		&b0, &b1, &b2, &b3,
 		&c0, &c1, &c2, &c3,
 	)
-	t.Logf("[a0=%.2f][a1=%.2f][a2=%.2f][a3=%.2f]\n", a0.Val, a1.Val, a2.Val, a3.Val)
-	t.Logf("[b0=%.2f][b1=%.2f][b2=%.2f][b3=%.2f]\n", b0.Val, b1.Val, b2.Val, b3.Val)
-	t.Logf("[c0=%.2f][c1=%.2f][c2=%.2f][c3=%.2f]\n", c0.Val, c1.Val, c2.Val, c3.Val)
+	t.Logf("[a0=%v][a1=%v][a2=%v][a3=%v]\n", a0.Val, a1.Val, a2.Val, a3.Val)
+	t.Logf("[b0=%v][b1=%v][b2=%v][b3=%v]\n", b0.Val, b1.Val, b2.Val, b3.Val)
+	t.Logf("[c0=%v][c1=%v][c2=%v][c3=%v]\n", c0.Val, c1.Val, c2.Val, c3.Val)
 }
 
 func BenchmarkMaximize(b *testing.B) {
